@@ -1,0 +1,54 @@
+import Link from 'next/link'
+
+# Validator
+
+## 📶Running a Validator
+
+## Set environment
+
+```js copy
+export MONIKER="YOUR_NODE_NAME_HERE"
+export WALLET="YOUR_WALLET_NAME_HERE"
+export DETAILS="YOUR_NODE_INFORMATION_HERE"
+export WEBSITE="YOUR_WEBSITE_HERE"
+export DISPLAY_PIC="YOUR_KEYBASE_IMAGE_PGP"
+export CONTACT="YOUR_CONTACT"
+```
+
+## Write env to .profile
+
+```js copy
+echo 'export MONIKER=${MONIKER}' >> ~/.profile
+echo 'export WALLET=${WALLET}' >> ~/.profile
+echo 'export DETAILS=${DETAILS}' >> ~/.profile
+echo 'export WEBSITE=${WEBSITE}' >> ~/.profile
+echo 'export DISPLAY_PIC=${DISPLAY_PIC}' >> ~/.profile
+echo 'export CONTACT=${CONTACT}' >> ~/.profile
+
+source ~/.profile
+```
+## Create Validator
+
+You can create your validator by using command below :
+
+```js copy
+crossfid --home ${DAEMON_HOME} tx staking create-validator \
+  --amount=9900000000000000000000mpx \
+  --pubkey=$(crossfid --home ${DAEMON_HOME} tendermint show-validator) \
+  --moniker="${MONIKER}" \
+  --identity=${DISPLAY_PIC} \
+  --details="${DETAILS}" \
+  --website="${WEBSITE}" \
+  --security-contact="${CONTACT}" \
+  --chain-id="crossfi-evm-testnet-1" \
+  --commission-rate="0.10" \
+  --commission-max-rate="0.20" \
+  --commission-max-change-rate="0.01" \
+  --min-self-delegation="1000000" \
+  --gas="auto" \
+  --gas-prices="10000000000000mpx" \
+  --gas-adjustment=1.5 \
+  --from=$WALLET
+```
+
+It's possible that you won't have enough MPX to be part of the active set of validators in the beginning. Users are able to delegate to inactive validators (those outside of the active set) using the XFI Console You can confirm that you are in the validator set by using a third party explorer like <Link href="https://explorer.zulnaaa.com">XFI Scan</Link>.
