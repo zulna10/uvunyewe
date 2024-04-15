@@ -1,4 +1,4 @@
-
+import { Steps } from 'nextra/components'
 
 # Installation
 
@@ -8,7 +8,9 @@
 - Memory: 32GB
 - Storage: 500GB-2TB
 
-## 📝Manual Installation
+<Steps>
+
+### 📝Manual Installation
 
 This guide is created under the assumption you are using Ubuntu 22.04 LTS
 If you use other OS, please modify the commands accordingly
@@ -24,7 +26,7 @@ export WALLET="YOUR_WALLET_NAME_HERE"
 
 DAEMON_HOME is reference only, you can set  wherever you want.
 
-## Write env to .profile
+### Write env to .profile
 
 ```js copy
 echo 'export DAEMON_NAME=${DAEMON_NAME}' >> ~/.profile
@@ -37,20 +39,20 @@ source ~/.profile
 ```
 
 
-## Install dependencies
+### Install dependencies
 
 ```js copy
 console.log('hello, world')
 ```
 
-## Prepare installation
+### Prepare installation
 
 ```js copy
 mkdir -p ${DAEMON_HOME}/cosmovisor/genesis/bin
 mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades
 ```
 
-## Install and Setup CrossFi Daemon
+### Install and Setup CrossFi Daemon
 
 ```js copy
 cd ${INSTALLATION_DIR}
@@ -72,32 +74,32 @@ sudo ln -s ${DAEMON_HOME}/cosmovisor/genesis ${DAEMON_HOME}/cosmovisor/current -
 sudo ln -s ${DAEMON_HOME}/cosmovisor/current/bin/${DAEMON_NAME} /usr/local/bin/${DAEMON_NAME} -f
 ```
 
-## Check crossfid version
+### Check crossfid version
 
 ```js copy
 crossfid --home ${DAEMON_HOME} version
 ```
 
-## Create or Restore Wallet
+### Create or Restore Wallet
 
-### If you want to create new wallet
+#### If you want to create new wallet
 
 ```js copy
 crossfid --home ${DAEMON_HOME} keys add ${WALLET}
 ```
 
-### If you already have wallet and want to use same phrase
+#### If you already have wallet and want to use same phrase
 ```js copy
 crossfid --home ${DAEMON_HOME} keys add ${WALLET} --recover
 ```
 
-## Check your wallet
+### Check your wallet
 
 ```js copy
 crossfid --home ${DAEMON_HOME} keys list
 ```
 
-## Setup pruning config
+### Setup pruning config
 
 ```js copy
 sed -i \
@@ -108,7 +110,7 @@ sed -i \
   ${DAEMON_HOME}/config/app.toml
 ```
 
-## Setting up Cosmovisor
+### Setting up Cosmovisor
 
 ```js copy
 sudo tee /etc/systemd/system/crossfi-testnet.service > /dev/null <<EOF  
@@ -133,7 +135,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-## Enable the service
+### Enable the service
 
 ```js copy
 sudo systemctl daemon-reload
@@ -141,7 +143,7 @@ sudo systemctl enable crossfi-testnet.service
 sudo systemctl start crossfi-testnet.service
 ```
 
-## Check service log
+### Check service log
 
 ```js copy
 sudo journalctl -xfu crossfi-testnet
@@ -149,9 +151,10 @@ sudo journalctl -xfu crossfi-testnet
 
 
 
-## Clean UP
+### Clean UP
 ```js copy
 rm -f cosmovisor-v1.5.0-linux-amd64.tar.gz
 rm -f crossfi-node_0.3.0-prebuild3_linux_amd64.tar.gz
 rm -f README.md CHANGELOG.md LICENSE readme.md cosmovisor
 ```
+</Steps>
