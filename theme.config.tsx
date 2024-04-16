@@ -26,5 +26,18 @@ export default {
   },
   feedback: {
     content: null
-  }
+  },
+  footer: {
+    text: (
+      <span>
+        {new Date().getFullYear()} ©{' '}
+        <a href="https://github.com/zulna10" target="_blank">
+          ZULNA
+        </a>
+        .
+      </span>
+    
+    ),
+    
+  },
 }
