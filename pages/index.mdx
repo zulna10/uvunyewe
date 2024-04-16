@@ -1,5 +1,25 @@
+import {naila} from "../public/hero.png"
+import Image from 'next/image'
+import { Tabs } from 'nextra/components'
 
-# Who am i?
+# About Me
+
+export const Hero = () => {
+    return (
+        <naila
+        width="200"
+        width="200"
+        src="../public/hero.png"
+        alt="naila pict"
+        />
+
+    )
+    
+}
+
+<Hero />
+
+![Hello](..\public\hero.png)
 
 
 ZULNA is not just validators; we're like friendly guides. Located in the beautiful landscape of Indonesia, we're ready to show you how we work, introduce our amazing team, and share our history of doing things really well in the blockchain world. Our primary goal is to empower you with the essential tools and knowledge needed for seamless node operations.
@@ -9,3 +29,13 @@ Although we're relatively new in this field, we have over 2+ years of experience
 We stand out by providing public infrastructure such as public node endpoints and running IBC relays across multiple chains, while prioritizing responsible governance and enthusiastic community engagement. Our dedication to the projects we validate includes creating documentation and services for fellow validators, strengthening infrastructure security through manual as well as automated settings.
 
 # Network Infrastructure
+
+<Tabs items={['Monitoring', 'Service', ]}>
+  <Tabs.Tab>For every node we manage, we ensure redundancy by utilizing Prometheus and Uptime Kuma for comprehensive metrics monitoring. These metrics are accessible through Grafana which offers a transparent overview of our node system performance. An illustration of our dashboard can be seen here. Additionally, we have created alert configurations through Uptime Kuma to notify us instantly via Telegram, Discord if there are any node-related issues.</Tabs.Tab>
+  
+  <Tabs.Tab>We offer the following services for public use:
+Daily public pruned snapshots and state sync for quick access to the latest block on every validated network.
+Daily public addrbooks to enhance peering needs.
+Public RPC endpoints serving all networks we validate.
+Maintenance of peers and seed nodes for every chain under our validation.</Tabs.Tab>
+</Tabs>

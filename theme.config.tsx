@@ -46,5 +46,7 @@ export default {
     
     ),
     
-  }
+  },
+  primaryHue: 100,
+  primarySaturation:100,
 }
