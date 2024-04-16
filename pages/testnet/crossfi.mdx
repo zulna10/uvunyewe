@@ -2,3 +2,18 @@
 Cross Finance is a next generation digital ecosystem offering cutting-edge payment solutions.
 
 ### Network Information
+
+<table>
+  <tbody>
+    {[
+      { country: 'Chain ID', flag: 'BLOCK', rpc:"RPC STATUS" },
+      { country: 'crossfi-evm-testnet-1', flag: '2779899', rpc:"Active"}
+    ].map(item => (
+      <tr key={item.country}>
+        <td>{item.country}</td>
+        <td>{item.flag}</td>
+        <td>{item.rpc}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
