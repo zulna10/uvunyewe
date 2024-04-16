@@ -12,6 +12,13 @@ export default {
       }
     }
   },
+  head: (
+    <>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta property="og:title" content="Zulna" />
+      <meta property="og:description" content="Service tools" />
+    </>
+  ),
   logo: <span>ZLN Docs</span>,
   banner: {
     key: '2.0-release',
