@@ -1,0 +1,192 @@
+import { Steps } from 'nextra/components'
+
+
+<Steps>
+# Cheat Sheet
+A Tendermint cheat sheet is a quick reference for essential commands to control Tendermint blockchains.
+
+### Managing keys
+
+```js filename="Generate new key"
+crossfid keys add wallet
+```
+
+```js filename="Recover key"
+crossfid keys add wallet --recover
+```
+```js filename="List all key"
+crossfid keys list
+```
+```js filename="Delete key"
+crossfid keys delete wallet
+```
+```js filename="Export key"
+crossfid keys export wallet
+```
+```js filename="Import key"
+crossfid keys import wallet wallet.backup
+```
+```js filename="Query wallet balances"
+crossfid q bank balances $(crossfid keys show wallet -a)
+```
+
+### Managing validators
+
+```js filename="Create validator"
+crossfid tx staking create-validator \
+--amount 1000000000000000000mpx \
+--pubkey $(crossfid tendermint show-validator) \
+--moniker "your-moniker-name" \
+--identity "your-keybase-id" \
+--details "your-details" \
+--website "your-website" \
+--security-contact "your-email" \
+--chain-id crossfi-evm-testnet-1 \
+--commission-rate 0.05 \
+--commission-max-rate 0.20 \
+--commission-max-change-rate 0.01 \
+--min-self-delegation 1 \
+--from wallet \
+--gas-adjustment 1.5 \
+--gas auto \
+--gas-prices 10000000000000mpx \
+-y
+```
+
+```js filename="Edit validator"
+crossfid tx staking edit-validator \
+--new-moniker "your-moniker-name" \
+--identity "your-keybase-id" \
+--details "your-details" \
+--website "your-website" \
+--security-contact "your-email" \
+--chain-id crossfi-evm-testnet-1 \
+--commission-rate 0.05 \
+--from wallet \
+--gas-adjustment 1.5 \
+--gas auto \
+--gas-prices 10000000000000mpx \
+-y
+```
+
+```js filename="Unjail validator"
+crossfid tx slashing unjail --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+
+```js filename="Validator jail reason"
+crossfid query slashing signing-info $(crossfid tendermint show-validator)
+```
+```js filename="List active validator"
+crossfid q staking validators -oj --limit=3000 | jq '.validators[] | select(.status=="BOND_STATUS_BONDED")' | jq -r '(.tokens|tonumber/pow(10; 6)|floor|tostring) + " \t " + .description.moniker' | sort -gr | nl
+```
+```js filename="List incative validator"
+crossfid q staking validators -oj --limit=3000 | jq '.validators[] | select(.status=="BOND_STATUS_UNBONDED")' | jq -r '(.tokens|tonumber/pow(10; 6)|floor|tostring) + " \t " + .description.moniker' | sort -gr | nl
+```
+```js filename="View validator details"
+crossfid q staking validator $(crossfid keys show wallet --bech val -a)
+```
+
+### Managing Tokens
+
+```js filename="Withdraw reward from all validator"
+crossfid tx distribution withdraw-all-rewards --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Withdraw reward and commission"
+crossfid tx distribution withdraw-rewards $(crossfid keys show wallet --bech val -a) --commission --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Delegate tokens to your validator"
+crossfid tx staking delegate $(crossfid keys show wallet --bech val -a) 1000000000000000000mpx --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Delegate token to other validator, change <to-valoper-address> as you like"
+crossfid tx staking delegate <to-valoper-address> 1000000000000000000mpx --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Redelegate to another validator"
+crossfid tx staking redelegate $(crossfid keys show wallet --bech val -a) <to-valoper-address> 1000000000000000000mpx --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Unbond token from your own validator"
+crossfid tx staking unbond $(crossfid keys show wallet --bech val -a) 1000000000000000000mpx --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Send token to the wallet"
+crossfid tx bank send wallet <to-wallet-address> 1000000000000000000mpx --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+### Governance
+
+```js filename="Query list proposal"
+crossfid query gov proposals
+```
+```js filename="View proposal by ID"
+crossfid query gov proposal 1
+```
+```js filename="Vote option yes"
+crossfid tx gov vote 1 yes --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Vote option no"
+crossfid tx gov vote 1 no --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Vote option asbtain"
+crossfid tx gov vote 1 abstain --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+```js filename="Vote option NoWithVeto"
+crossfid tx gov vote 1 NoWithVeto --from wallet --chain-id crossfi-evm-testnet-1 --gas-adjustment 1.5 --gas auto --gas-prices 10000000000000mpx -y
+```
+
+### Usefulness
+
+```js filename="Update custom port"
+CUSTOM_PORT=239
+sed -i -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:${CUSTOM_PORT}58\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:${CUSTOM_PORT}57\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:${CUSTOM_PORT}60\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:${CUSTOM_PORT}56\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":${CUSTOM_PORT}66\"%" $HOME/.mineplex-chain/config/config.toml
+sed -i -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${CUSTOM_PORT}17\"%; s%^address = \":8080\"%address = \":${CUSTOM_PORT}80\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${CUSTOM_PORT}90\"%; s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${CUSTOM_PORT}91\"%" $HOME/.mineplex-chain/config/app.toml
+```
+```js filename="Disable indexer"
+sed -i -e 's|^indexer *=.*|indexer = "null"|' $HOME/.mineplex-chain/config/config.toml
+```
+```js filename="Enable indexer"
+sed -i -e 's|^indexer *=.*|indexer = "kv"|' $HOME/.mineplex-chain/config/config.toml
+```
+```js filename="Pruning update"
+sed -i \
+  -e 's|^pruning *=.*|pruning = "custom"|' \
+  -e 's|^pruning-keep-recent *=.*|pruning-keep-recent = "100"|' \
+  -e 's|^pruning-keep-every *=.*|pruning-keep-every = "0"|' \
+  -e 's|^pruning-interval *=.*|pruning-interval = "19"|' \
+  $HOME/.mineplex-chain/config/app.toml
+```
+
+### Maintenance
+
+```js filename="Get validator information"
+crossfid status 2>&1 | jq .ValidatorInfo
+```
+```js filename="Get sync information"
+crossfid status 2>&1 | jq .SyncInfo
+```
+```js filename="Get node peer"
+echo $(crossfid tendermint show-node-id)'@'$(curl -s ifconfig.me)':'$(cat $HOME/.mineplex-chain/config/config.toml | sed -n '/Address to listen for incoming connection/{n;p;}' | sed 's/.*://; s/".*//')
+```
+```js filename="Check validator keys"
+[[ $(crossfid q staking validator $(crossfid keys show wallet --bech val -a) -oj | jq -r .consensus_pubkey.key) = $(crossfid status | jq -r .ValidatorInfo.PubKey.value) ]] && echo -e "\n\e[1m\e[32mTrue\e[0m\n" || echo -e "\n\e[1m\e[31mFalse\e[0m\n"
+```
+```js filename="Get live peers"
+curl -sS http://localhost:23957/net_info | jq -r '.result.peers[] | "\(.node_info.id)@\(.remote_ip):\(.node_info.listen_addr)"' | awk -F ':' '{print $1":"$(NF)}'
+```
+```js filename="Configure minimum gas prices"
+sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"10mpx\"/" $HOME/.mineplex-chain/config/app.toml
+```
+```js filename="Enable prometheus"
+sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.mineplex-chain/config/config.toml
+```
+```js filename="Reset chain data"
+crossfid tendermint unsafe-reset-all --keep-addr-book --home $HOME/.mineplex-chain --keep-addr-book
+```
+```js filename="Remove node"
+cd $HOME
+sudo systemctl stop cascadia
+sudo systemctl disable cascadia
+sudo rm /etc/systemd/system/cascadia.service
+sudo systemctl daemon-reload
+sudo rm -f $(which crossfid)
+sudo rm -rf $HOME/.mineplex-chain
+sudo rm -rf $HOME/cascadia
+sudo rm -rf $HOME/go
+```
+</Steps>

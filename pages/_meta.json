@@ -14,5 +14,11 @@
     "guide": {
       "title": "GUIDE",
       "type": "page"
-    }
+    },
+    "explorer": {
+        "title": "EXPLORER ↗",
+        "type": "page",
+        "href": "https://explorer.zulnaaa.com",
+        "newWindow": true
   }
+}
