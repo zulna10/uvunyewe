@@ -23,7 +23,7 @@ export default {
   banner: {
     key: '2.0-release',
     text: (
-      <a href="https://nextra.site" target="_blank">
+      <a href="https://service.zulnaaa.com" target="_blank">
         SUP DUDE, WELCOME TO MY DOCS
       </a>
     )
