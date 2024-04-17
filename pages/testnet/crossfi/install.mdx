@@ -1,0 +1,160 @@
+import { Steps } from 'nextra/components'
+
+# Installation
+
+## 🖥️Hardware Requirements
+
+- CPU: 8 Core(s)
+- Memory: 32GB
+- Storage: 500GB-2TB
+
+<Steps>
+
+### 📝Manual Installation
+
+This guide is created under the assumption you are using Ubuntu 22.04 LTS
+If you use other OS, please modify the commands accordingly
+
+```js copy
+export INSTALLATION_DIR=$HOME/appl
+export DAEMON_NAME=crossfid
+export DAEMON_HOME=${INSTALLATION_DIR}/testnet
+export SERVICE_NAME=crossfi-testnet
+export MONIKER="YOUR_NODE_NAME_HERE"
+export WALLET="YOUR_WALLET_NAME_HERE"
+```
+
+DAEMON_HOME is reference only, you can set  wherever you want.
+
+### Write env to .profile
+
+```js copy
+echo 'export DAEMON_NAME=${DAEMON_NAME}' >> ~/.profile
+echo 'export DAEMON_HOME=${DAEMON_HOME}' >> ~/.profile
+echo 'export DAEMON_ALLOW_DOWNLOAD_BINARIES=true' >> ~/.profile
+echo 'export DAEMON_RESTART_AFTER_UPGRADE=true' >> ~/.profile
+echo 'export DAEMON_LOG_BUFFER_SIZE=512' >> ~/.profile
+
+source ~/.profile
+```
+
+
+### Install dependencies
+
+```js copy
+console.log('hello, world')
+```
+
+### Prepare installation
+
+```js copy
+mkdir -p ${DAEMON_HOME}/cosmovisor/genesis/bin
+mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades
+```
+
+### Install and Setup CrossFi Daemon
+
+```js copy
+cd ${INSTALLATION_DIR}
+
+#Download CrossFi Daemon and basic setup
+wget https://github.com/crossfichain/crossfi-node/releases/download/v0.3.0-prebuild3/crossfi-node_0.3.0-prebuild3_linux_amd64.tar.gz
+tar -xf crossfi-node_0.3.0-prebuild3_linux_amd64.tar.gz
+git clone https://github.com/crossfichain/testnet.git
+
+#Download and install cosmovisor
+wget https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.5.0/cosmovisor-v1.5.0-linux-amd64.tar.gz
+tar -xvzf cosmovisor-v1.5.0-linux-amd64.tar.gz
+
+#Copy Binaries
+cp cosmovisor ${INSTALLATION_DIR}/bin/cosmovisor
+cp ${INSTALLATION_DIR}/bin/${DAEMON_NAME} ${DAEMON_HOME}/cosmovisor/genesis/bin
+sudo ln -s ${INSTALLATION_DIR}/bin/cosmovisor /usr/local/bin/cosmovisor -f
+sudo ln -s ${DAEMON_HOME}/cosmovisor/genesis ${DAEMON_HOME}/cosmovisor/current -f
+sudo ln -s ${DAEMON_HOME}/cosmovisor/current/bin/${DAEMON_NAME} /usr/local/bin/${DAEMON_NAME} -f
+```
+
+### Check crossfid version
+
+```js copy
+crossfid --home ${DAEMON_HOME} version
+```
+
+### Create or Restore Wallet
+
+#### If you want to create new wallet
+
+```js copy
+crossfid --home ${DAEMON_HOME} keys add ${WALLET}
+```
+
+#### If you already have wallet and want to use same phrase
+```js copy
+crossfid --home ${DAEMON_HOME} keys add ${WALLET} --recover
+```
+
+### Check your wallet
+
+```js copy
+crossfid --home ${DAEMON_HOME} keys list
+```
+
+### Setup pruning config
+
+```js copy
+sed -i \
+  -e 's|^pruning *=.*|pruning = "custom"|' \
+  -e 's|^pruning-keep-recent *=.*|pruning-keep-recent = "100"|' \
+  -e 's|^pruning-keep-every *=.*|pruning-keep-every = "0"|' \
+  -e 's|^pruning-interval *=.*|pruning-interval = "10"|' \
+  ${DAEMON_HOME}/config/app.toml
+```
+
+### Setting up Cosmovisor
+
+```js copy
+sudo tee /etc/systemd/system/crossfi-testnet.service > /dev/null <<EOF  
+[Unit]
+Description=CrossFi Testnet Daemon (cosmovisor)
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=$(which cosmovisor) run start --home ${DAEMON_HOME}
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+Environment="DAEMON_NAME=${DAEMON_NAME}"
+Environment="DAEMON_HOME=${DAEMON_HOME}"
+Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=true"
+Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+Environment="DAEMON_LOG_BUFFER_SIZE=512"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+### Enable the service
+
+```js copy
+sudo systemctl daemon-reload
+sudo systemctl enable crossfi-testnet.service
+sudo systemctl start crossfi-testnet.service
+```
+
+### Check service log
+
+```js copy
+sudo journalctl -xfu crossfi-testnet
+```
+
+
+
+### Clean UP
+```js copy
+rm -f cosmovisor-v1.5.0-linux-amd64.tar.gz
+rm -f crossfi-node_0.3.0-prebuild3_linux_amd64.tar.gz
+rm -f README.md CHANGELOG.md LICENSE readme.md cosmovisor
+```
+</Steps>
